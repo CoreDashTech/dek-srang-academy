@@ -6,7 +6,7 @@ export function xy(series,{w=680,h=380,xl='',yl='',xd=1,yd=1,yMin=null,xMin=null
   const all=series.flatMap(s=>s.pts);if(!all.length)return'';
   let x0=Math.min(...all.map(p=>p.x)),x1=Math.max(...all.map(p=>p.x)),y0=Math.min(...all.map(p=>p.y)),y1=Math.max(...all.map(p=>p.y));
   const px=(x1-x0||1)*.06,py=(y1-y0||1)*.08;x0-=px;x1+=px;y0-=py;y1+=py;if(yMin!=null)y0=Math.min(y0,yMin);if(xMin!=null)x0=Math.min(x0,xMin);
-  const xt=nice(x0,x1),yt=nice(y0,y1);x0=xt[0];x1=xt[xt.length-1];y0=yt[0];y1=yt[yt.length-1];
+  const xt=nice(x0,x1),yt=nice(y0,y1);x0=xt[0];x1=xt[xt.length-1];y0=yt[0];y1=yt[yt.length-1];const dd=t=>{const st=t.length>1?t[1]-t[0]:1;return st>=1?0:Math.min(3,Math.ceil(-Math.log10(st)-1e-9))};xd=Math.max(xd>1?1:xd,dd(xt));yd=Math.max(yd>1?1:yd,dd(yt));
   const L=66,R=16,T=12,B=44,X=v=>L+(v-x0)/(x1-x0||1)*(w-L-R),Y=v=>h-B-(v-y0)/(y1-y0||1)*(h-T-B);
   let s=`<svg class="xy" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(xl)} / ${esc(yl)}">`;
   yt.forEach(v=>s+=`<line class="gl" x1="${L}" x2="${w-R}" y1="${Y(v)}" y2="${Y(v)}"/><text class="axt" x="${L-6}" y="${Y(v)+4}" text-anchor="end">${fNum(v,yd)}</text>`);

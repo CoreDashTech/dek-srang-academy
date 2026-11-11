@@ -210,3 +210,5 @@ svg.av{overflow:hidden}.av.ring{box-shadow:0 0 0 3px var(--tc,var(--gold)),0 4px
 @media print{.rep{max-width:none}.rep-s{break-after:avoid}.rep .g2{break-inside:avoid}svg.xy{max-height:230px}.rep-p,.rep .kv2{break-inside:avoid}}
 .i.flip{transform:scaleX(-1)}.xy .axt,.xy .axl{font-size:15px}.rdr .axt{font-size:14px}.xy circle{transition:r .1s}
 .rep-p>div{flex:1;min-width:260px}
+.jgc{display:flex;flex-direction:column;gap:4px;background:var(--surface2);border-radius:14px;padding:12px 14px}.jgc span{font-size:.82rem;color:var(--mut)}.jgc b{font-size:1.7rem;line-height:1.1}
+.mv{min-height:40px;padding:0 14px;border-radius:999px;border:1.5px dashed var(--line);background:var(--surface);cursor:pointer;font-weight:500}.mv.s1{border-style:solid;border-color:#e0a21a;background:var(--warnbg);color:var(--warn)}.mv.s2{border-style:solid;border-color:var(--ok);background:var(--okbg);color:var(--ok);font-weight:600}.mv:disabled{cursor:default}

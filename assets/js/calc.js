@@ -13,7 +13,7 @@ export function matchTot(p){const m=S.mstats.filter(x=>x.playerId===p.id);return
 export const wellAvg=(p,k,days=14)=>{const lim=Date.now()-days*DAY;return avg(S.well.filter(x=>x.playerId===p.id&&x.date>=lim).map(x=>x[k]))};
 export function growthRate(p){const r=rows('meas',p.id);if(r.length<2)return null;const a=r[0],b=r[r.length-1],y=(b.date-a.date)/(365.25*DAY);return y>.3?(b.h-a.h)/y:null}
 const sc=v=>v==null?null:Math.round(Math.max(25,Math.min(99,20+(v-1)*8.8)));
-export function attrs(p){const o=skillNow(p);if(!o)return null;const m=(...k)=>sc(avg(k.map(x=>o[x])));return{PAC:m('spd','agi'),SHO:m('sho'),PAS:m('pas','dec'),DRI:m('dri','tch'),DEF:m('def','pos'),PHY:m('str','end')}}
+export function attrs(p){const o=skillNow(p);if(!o)return null;const m=(...k)=>sc(avg(k.map(x=>o[x])));return{PAC:m('spd','agi','sta'),SHO:m('sho'),PAS:m('pas','dec'),DRI:m('dri','tch'),DEF:m('def','pos'),PHY:m('str','end','bal','cor')}}
 export const overall=p=>{const a=attrs(p);return a?Math.round(avg(Object.values(a))):null};
 export function bodyStatus(p){const m=measNow(p);if(!m)return null;const a=curAge(p),hr=refAt(S.settings.ref,p.gender,a,'h'),wr=refAt(S.settings.ref,p.gender,a,'w');return{h:m.h,w:m.w,bmi:bmi(m.h,m.w),hr,wr,hp:m.h/hr*100,wp:m.w/wr*100,date:m.date}}
 export const METRICS=[
