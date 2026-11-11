@@ -1,0 +1,23 @@
+import {S,by,can,save,teamName,coachName} from './store.js';
+import {esc,T,nm,uid} from './util.js';
+import {ic,head,tabs,form,ask,toast,ACT,refresh} from './ui.js';
+import {avatar,teamPill} from './parts.js';
+import {skillAvg,attPct} from './calc.js';
+import {sum,fNum} from './util.js';
+export const title=()=>T('ทีมและโค้ช','Teams & coaches');
+let tab='teams';
+export function render(){const ed=can('manage');
+  return`${head(T('ทีมและโค้ช','Teams & coaches'),T('จัดกลุ่มอายุ ทีม และทีมงานโค้ช','Age groups, squads and coaching staff'),ed?`<button class="btn pri" data-act="tmNew">${ic('plus')}${T('เพิ่ม','Add')}</button>`:'')}
+  <div class="card">${tabs(tab,[['teams',T('ทีม / รุ่นอายุ','Teams')+' ('+S.teams.length+')'],['coaches',T('โค้ช','Coaches')+' ('+S.coaches.length+')']],'tmTab')}
+  ${tab==='teams'?`<div class="g g3">${S.teams.map(t=>{const pl=S.players.filter(p=>p.teamId===t.id),sk=pl.map(p=>skillAvg(p)).filter(x=>x!=null),ap=pl.map(p=>attPct(p)).filter(x=>x!=null);return`<div class="card cc" style="border-top:4px solid ${t.color}"><div class="row spb"><b style="font-size:1.1rem">${esc(nm(t.name))}</b>${ed?`<span class="row"><button class="btn sm" data-act="tmEdit" data-id="${t.id}">${ic('edit')}</button><button class="btn sm bad" data-act="tmDel" data-id="${t.id}" aria-label="${T('ลบ','Delete')}">${ic('trash')}</button></span>`:''}</div>
+   <small class="mut">${T('อายุ','Ages')} ${t.ages[0]}–${t.ages[1]} · ${esc(t.day||'')} ${esc(t.time||'')} · ${esc(coachName(t.coachId))}</small><div class="kv2" style="margin-top:6px"><span>${T('นักเตะ','Players')}<b>${pl.length}</b></span><span>${T('ทักษะเฉลี่ย','Skill')}<b>${sk.length?fNum(sum(sk)/sk.length,1):'—'}</b></span><span>${T('เข้าซ้อม','Attend.')}<b>${ap.length?fNum(sum(ap)/ap.length,0)+'%':'—'}</b></span></div>
+   <div class="avs">${pl.slice(0,8).map(p=>`<a href="#/players/${p.id}">${avatar(p,34)}</a>`).join('')}</div></div>`}).join('')}</div>`
+  :`<div class="tbw"><table class="tb"><thead><tr><th>${T('ชื่อ','Name')}</th><th>${T('หน้าที่','Role')}</th><th>${T('ใบอนุญาต','License')}</th><th>${T('โทร','Phone')}</th><th></th></tr></thead><tbody>${S.coaches.map(c=>`<tr><td><b>${esc(nm(c.name))}</b></td><td>${esc(c.role)}</td><td>${esc(c.lic)}</td><td>${esc(c.phone)}</td><td class="r">${ed?`<button class="btn sm" data-act="tmEdit" data-id="${c.id}">${ic('edit')}</button> <button class="btn sm bad" data-act="tmDel" data-id="${c.id}" aria-label="${T('ลบ','Delete')}">${ic('trash')}</button>`:''}</td></tr>`).join('')}</tbody></table></div>`}</div>`}
+ACT.tmTab=b=>{tab=b.dataset.v;refresh()};
+const f=o=>tab==='teams'?[{k:'nth',label:T('ชื่อทีม (ไทย)','Name (TH)'),value:o?.name.th||'',full:true},{k:'nen',label:T('ชื่อทีม (อังกฤษ)','Name (EN)'),value:o?.name.en||'',full:true},{k:'a0',label:T('อายุต่ำสุด','Min age'),type:'number',value:o?.ages[0]??8},{k:'a1',label:T('อายุสูงสุด','Max age'),type:'number',value:o?.ages[1]??10},{k:'color',label:T('สีทีม','Team colour'),type:'color',value:o?.color||'#2563eb'},{k:'coachId',label:T('โค้ชหลัก','Head coach'),type:'select',value:o?.coachId||'',opts:[['',T('— ไม่ระบุ —','— none —')],...S.coaches.map(c=>[c.id,nm(c.name)])]},{k:'day',label:T('วันซ้อม','Days'),value:o?.day||''},{k:'time',label:T('เวลา','Time'),type:'time',value:o?.time||'16:30'}]
+ :[{k:'nth',label:T('ชื่อ (ไทย)','Name (TH)'),value:o?.name.th||'',full:true},{k:'nen',label:T('ชื่อ (อังกฤษ)','Name (EN)'),value:o?.name.en||'',full:true},{k:'role',label:T('หน้าที่','Role'),value:o?.role||''},{k:'lic',label:T('ใบอนุญาต','License'),value:o?.lic||''},{k:'phone',label:T('โทร','Phone'),value:o?.phone||'',full:true}];
+const ap=(o,v)=>{o.name={th:v.nth||v.nen,en:v.nen||v.nth};if(tab==='teams')Object.assign(o,{ages:[v.a0??8,v.a1??10],color:v.color,coachId:v.coachId,day:v.day,time:v.time});else Object.assign(o,{role:v.role,lic:v.lic,phone:v.phone})};
+const col=()=>tab==='teams'?'teams':'coaches';
+ACT.tmNew=async()=>{const v=await form(T('เพิ่ม','Add'),f(null));if(!v||!(v.nth||v.nen))return;const o={id:uid(tab==='teams'?'t':'c')};ap(o,v);S[col()].push(o);save();refresh()};
+ACT.tmEdit=async b=>{const o=by(col(),b.dataset.id),v=await form(T('แก้ไข','Edit'),f(o));if(!v)return;ap(o,v);save();refresh()};
+ACT.tmDel=async b=>{const id=b.dataset.id;if(tab==='teams'&&S.players.some(p=>p.teamId===id)){toast(T('ลบไม่ได้ — ยังมีนักเตะในทีมนี้','Cannot delete — team has players'),4000);return}if(tab==='coaches'&&S.teams.some(t=>t.coachId===id)){toast(T('ลบไม่ได้ — โค้ชคนนี้ยังดูแลทีมอยู่','Cannot delete — coach assigned to a team'),4000);return}if(!await ask(T('ลบรายการนี้?','Delete?'),'',T('ลบ','Delete'),'bad'))return;S[col()]=S[col()].filter(x=>x.id!==id);save();refresh()};
